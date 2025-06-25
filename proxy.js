@@ -18,7 +18,7 @@ app.get('/trains.json', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = 3008;
 app.listen(PORT, () => {
   console.log(`Proxy server running on port ${PORT}`);
 }); 
