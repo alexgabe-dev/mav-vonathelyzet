@@ -1,3 +1,5 @@
+const fs = require('fs');
+const https = require('https');
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
@@ -18,7 +20,13 @@ app.get('/trains.json', async (req, res) => {
   }
 });
 
+// SSL tanúsítványok betöltése
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/vonat.pry.hu/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/vonat.pry.hu/fullchain.pem')
+};
+
 const PORT = 3008;
-app.listen(PORT, () => {
-  console.log(`Proxy server running on port ${PORT}`);
+https.createServer(options, app).listen(PORT, () => {
+  console.log(`HTTPS Proxy server running on port ${PORT}`);
 }); 
