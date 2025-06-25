@@ -1,0 +1,13 @@
+{
+  "name": "vonat-proxy",
+  "version": "1.0.0",
+  "description": "Proxy szerver a vonat.pry.hu-hoz CORS problémák megoldására",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7"
+  }
+} 

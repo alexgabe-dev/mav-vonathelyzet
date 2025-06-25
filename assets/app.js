@@ -12605,7 +12605,7 @@ const W_ = {
           } catch (P) {
             return console.error("Failed to fetch vehicle type:", P), null
           }
-        }, h = async () => (await (await fetch("https://b.vonatterkep.hu/trains.json")).json()).vehiclePositions, f = S => Tn.divIcon({
+        }, h = async () => (await (await fetch("https://vonat.pry.hu:3000/trains.json")).json()).vehiclePositions, f = S => Tn.divIcon({
           html: `<div class="train-marker">
                 <div class="circle" style="background-color: ${Rm(S.trip.arrivalStoptime.arrivalDelay/60)};"></div>
                 <div class="arrow" style="transform: translate(-50%, -50%) rotate(${S.heading}deg) translateY(-10px);"></div>
