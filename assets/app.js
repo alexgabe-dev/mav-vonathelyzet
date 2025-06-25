@@ -12643,7 +12643,7 @@ const W_ = {
         };
       return yu(() => {
         e = Yr(Tn.map("map").setView([47.162494, 19.503304], 8)), Tn.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | contact@vonatterkep.hu | Ez az oldal nem hivatalos és nem áll kapcsolatban a MÁV Csoporttal'
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(e), h().then(v), setInterval(() => {
           h().then(S => {
             x(), v(S)
