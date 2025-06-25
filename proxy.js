@@ -1,11 +1,9 @@
-const fs = require('fs');
-const https = require('https');
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // vagy 'https://vonat.pry.hu' ha csak magadnak akarod
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
@@ -20,13 +18,7 @@ app.get('/trains.json', async (req, res) => {
   }
 });
 
-// SSL tanúsítványok betöltése
-const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/vonat.pry.hu/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/vonat.pry.hu/fullchain.pem')
-};
-
 const PORT = 3008;
-https.createServer(options, app).listen(PORT, () => {
-  console.log(`HTTPS Proxy server running on port ${PORT}`);
-}); 
+app.listen(PORT, () => {
+  console.log(`Proxy server running on port ${PORT}`);
+});
