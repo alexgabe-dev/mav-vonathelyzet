@@ -6,8 +6,183 @@
     <title>Vonattérkép 2.0</title>
     <script type="module" crossorigin src="/assets/app.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/styles.css">
+    <style>
+      .api-status {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .api-status:hover {
+        background: rgba(0, 0, 0, 0.9);
+      }
+      .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        transition: background-color 0.3s;
+      }
+      .status-checking {
+        background-color: #ffd700;
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255,215,0, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(255,215,0, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255,215,0, 0); }
+      }
+      .status-online {
+        background-color: #4caf50;
+      }
+      .status-offline {
+        background-color: #f44336;
+      }
+      .api-info-modal {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        padding: 16px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        max-width: 300px;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s, transform 0.3s;
+        pointer-events: none;
+        z-index: 1001;
+      }
+      .api-info-modal.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+      .api-info-modal h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #1a1a1a;
+      }
+      .api-info-modal p {
+        margin: 0;
+        line-height: 1.5;
+      }
+      .api-info-modal a {
+        color: #2196f3;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .api-info-modal a:hover {
+        color: #1976d2;
+      }
+      .close-button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 20px;
+        height: 20px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 18px;
+        transition: color 0.2s;
+      }
+      .close-button:hover {
+        color: #333;
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
+    <div class="api-status">
+      <div class="status-indicator status-checking"></div>
+      <span class="status-text">API állapot ellenőrzése...</span>
+    </div>
+    <div class="api-info-modal">
+      <button class="close-button">×</button>
+      <h3>API Információ</h3>
+      <p>Az élő vasúti adatokat a <a href="https://vonatterkep.hu" target="_blank" rel="noopener">vonatterkep.hu</a> szolgáltatja.</p>
+    </div>
+    <script>
+      let lastSuccessfulUpdate = 0;
+      const API_URL = '/trains.json'; // vagy módosítsd, ha máshol van a proxy
+
+      function updateApiStatus(success) {
+        const indicator = document.querySelector('.status-indicator');
+        const statusText = document.querySelector('.status-text');
+        if (success) {
+          lastSuccessfulUpdate = Date.now();
+          indicator.classList.remove('status-checking', 'status-offline');
+          indicator.classList.add('status-online');
+          statusText.textContent = 'API kapcsolat aktív';
+        } else {
+          if (Date.now() - lastSuccessfulUpdate > 60000) {
+            indicator.classList.remove('status-checking', 'status-online');
+            indicator.classList.add('status-offline');
+            statusText.textContent = 'API kapcsolat megszakadt';
+          } else {
+            indicator.classList.remove('status-online', 'status-offline');
+            indicator.classList.add('status-checking');
+            statusText.textContent = 'API állapot ellenőrzése...';
+          }
+        }
+      }
+
+      async function checkApi() {
+        try {
+          const response = await fetch(API_URL, {cache: 'no-store'});
+          if (response.ok) {
+            updateApiStatus(true);
+          } else {
+            updateApiStatus(false);
+          }
+        } catch (e) {
+          updateApiStatus(false);
+        }
+      }
+
+      // Modal logika
+      const apiStatus = document.querySelector('.api-status');
+      const apiInfoModal = document.querySelector('.api-info-modal');
+      const closeButton = document.querySelector('.close-button');
+
+      apiStatus.addEventListener('click', () => {
+        apiInfoModal.classList.add('show');
+      });
+
+      closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        apiInfoModal.classList.remove('show');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!apiInfoModal.contains(e.target) && !apiStatus.contains(e.target)) {
+          apiInfoModal.classList.remove('show');
+        }
+      });
+
+      // Induláskor és időközönként ellenőrizze az API-t
+      updateApiStatus(false);
+      checkApi();
+      setInterval(checkApi, 30000); // 30 másodpercenként
+    </script>
   </body>
 </html>
